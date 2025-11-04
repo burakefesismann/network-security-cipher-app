@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using SecurityProject.Services;
@@ -60,16 +61,24 @@ public partial class CaesarCipherControl : UserControl
 
     private void BruteForceButton_Click(object sender, RoutedEventArgs e)
     {
-        if (CipherTextOutput == null || BruteForceResults == null) return;
+        if (PlainTextInput == null || BruteForceResults == null || ModeComboBox == null) return;
         
-        if (string.IsNullOrWhiteSpace(CipherTextOutput.Text))
+        bool isEncrypt = ModeComboBox.SelectedIndex == 0;
+        string cipherText = isEncrypt 
+            ? (CipherTextOutput?.Text ?? "") 
+            : PlainTextInput.Text;
+        
+        if (string.IsNullOrWhiteSpace(cipherText))
         {
-            MessageBox.Show("Please encrypt some text first!", "Brute Force", 
-                           MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(isEncrypt 
+                ? "Please encrypt some text first!" 
+                : "Please enter cipher text to brute force!", 
+                "Brute Force", 
+                MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
-        var results = cipher.BruteForce(CipherTextOutput.Text);
+        var results = cipher.BruteForce(cipherText);
         BruteForceResults.ItemsSource = results.Select((text, index) => $"Key {index + 1,2}: {text}");
     }
     

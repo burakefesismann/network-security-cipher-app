@@ -111,7 +111,6 @@
                         </StackPanel>
                     </Border>
                 </Grid>
-
                 <!-- Brute Force -->
                 <Border Style="{StaticResource CardStyle}">
                     <StackPanel>
@@ -156,6 +155,7 @@
                         </ScrollViewer>
                     </StackPanel>
                 </Border>
+
                 
                 <!-- Back Button -->
                 <Button Content="← Back to Menu" 
