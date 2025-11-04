@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using SecurityProject.Services;
@@ -7,10 +8,15 @@ namespace SecurityProject.Views.UserControls;
 public partial class Base64CipherControl : UserControl
 {
     private Base64Cipher cipher = new Base64Cipher();
+    private ObservableCollection<StepInfo> displayedSteps = new ObservableCollection<StepInfo>();
+    private System.Windows.Threading.DispatcherTimer? stepTimer;
+    private List<StepInfo>? pendingSteps;
 
     public Base64CipherControl()
     {
         InitializeComponent();
+        if (StepsDisplay != null)
+            StepsDisplay.ItemsSource = displayedSteps;
         UpdateCipher();
     }
 
@@ -44,21 +50,56 @@ public partial class Base64CipherControl : UserControl
                 : cipher.Decode(PlainTextInput.Text);
             CipherTextOutput.Text = result;
             
-            // Update step-by-step display
-            if (StepsDisplay != null)
-            {
-                var steps = isEncode 
-                    ? cipher.GetEncodingSteps(PlainTextInput.Text)
-                    : cipher.GetDecodingSteps(PlainTextInput.Text);
-                StepsDisplay.ItemsSource = steps;
-            }
+            // Update step-by-step display with animation
+            AnimateSteps(isEncode, PlainTextInput.Text);
         }
         else
         {
             CipherTextOutput.Text = "";
-            if (StepsDisplay != null)
-                StepsDisplay.ItemsSource = null;
+            StopStepAnimation();
+            displayedSteps.Clear();
         }
+    }
+
+    private void AnimateSteps(bool isEncode, string text)
+    {
+        StopStepAnimation();
+        displayedSteps.Clear();
+        
+        var steps = isEncode 
+            ? cipher.GetEncodingSteps(text)
+            : cipher.GetDecodingSteps(text);
+        
+        if (steps.Count == 0) return;
+        
+        pendingSteps = steps;
+        int currentIndex = 0;
+        
+        stepTimer = new System.Windows.Threading.DispatcherTimer();
+        stepTimer.Interval = TimeSpan.FromMilliseconds(300);
+        stepTimer.Tick += (s, e) =>
+        {
+            if (currentIndex < pendingSteps.Count)
+            {
+                displayedSteps.Add(pendingSteps[currentIndex]);
+                currentIndex++;
+            }
+            else
+            {
+                StopStepAnimation();
+            }
+        };
+        stepTimer.Start();
+    }
+
+    private void StopStepAnimation()
+    {
+        if (stepTimer != null)
+        {
+            stepTimer.Stop();
+            stepTimer = null;
+        }
+        pendingSteps = null;
     }
     
     private void BackButton_Click(object sender, RoutedEventArgs e)

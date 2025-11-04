@@ -173,7 +173,22 @@
                                                Padding="12"
                                                Margin="0,0,0,8"
                                                BorderThickness="1"
-                                               BorderBrush="{StaticResource PrimaryBrush}">
+                                               BorderBrush="{StaticResource PrimaryBrush}"
+                                               Opacity="0">
+                                            <Border.Triggers>
+                                                <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+                                                    <BeginStoryboard>
+                                                        <Storyboard>
+                                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                                             From="0" To="1" Duration="0:0:0.4">
+                                                                <DoubleAnimation.EasingFunction>
+                                                                    <QuadraticEase EasingMode="EaseOut"/>
+                                                                </DoubleAnimation.EasingFunction>
+                                                            </DoubleAnimation>
+                                                        </Storyboard>
+                                                    </BeginStoryboard>
+                                                </EventTrigger>
+                                            </Border.Triggers>
                                             <StackPanel>
                                                 <TextBlock FontSize="14" FontWeight="Bold" 
                                                           Foreground="{StaticResource PrimaryBrush}"

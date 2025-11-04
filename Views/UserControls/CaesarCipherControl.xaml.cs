@@ -1,6 +1,8 @@
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using SecurityProject.Services;
 
 namespace SecurityProject.Views.UserControls;
@@ -8,10 +10,15 @@ namespace SecurityProject.Views.UserControls;
 public partial class CaesarCipherControl : UserControl
 {
     private CaesarCipher cipher = new CaesarCipher();
+    private ObservableCollection<StepInfo> displayedSteps = new ObservableCollection<StepInfo>();
+    private System.Windows.Threading.DispatcherTimer? stepTimer;
+    private List<StepInfo>? pendingSteps;
 
     public CaesarCipherControl()
     {
         InitializeComponent();
+        if (StepsDisplay != null)
+            StepsDisplay.ItemsSource = displayedSteps;
         UpdateCipher();
     }
 
@@ -53,21 +60,56 @@ public partial class CaesarCipherControl : UserControl
                 : cipher.Decrypt(PlainTextInput.Text, key);
             CipherTextOutput.Text = result;
             
-            // Update step-by-step display
-            if (StepsDisplay != null)
-            {
-                var steps = isEncrypt 
-                    ? cipher.GetEncryptionSteps(PlainTextInput.Text, key)
-                    : cipher.GetDecryptionSteps(PlainTextInput.Text, key);
-                StepsDisplay.ItemsSource = steps;
-            }
+            // Update step-by-step display with animation
+            AnimateSteps(isEncrypt, PlainTextInput.Text, key);
         }
         else
         {
             CipherTextOutput.Text = "";
-            if (StepsDisplay != null)
-                StepsDisplay.ItemsSource = null;
+            StopStepAnimation();
+            displayedSteps.Clear();
         }
+    }
+
+    private void AnimateSteps(bool isEncrypt, string text, int key)
+    {
+        StopStepAnimation();
+        displayedSteps.Clear();
+        
+        var steps = isEncrypt 
+            ? cipher.GetEncryptionSteps(text, key)
+            : cipher.GetDecryptionSteps(text, key);
+        
+        if (steps.Count == 0) return;
+        
+        pendingSteps = steps;
+        int currentIndex = 0;
+        
+        stepTimer = new System.Windows.Threading.DispatcherTimer();
+        stepTimer.Interval = TimeSpan.FromMilliseconds(300);
+        stepTimer.Tick += (s, e) =>
+        {
+            if (currentIndex < pendingSteps.Count)
+            {
+                displayedSteps.Add(pendingSteps[currentIndex]);
+                currentIndex++;
+            }
+            else
+            {
+                StopStepAnimation();
+            }
+        };
+        stepTimer.Start();
+    }
+
+    private void StopStepAnimation()
+    {
+        if (stepTimer != null)
+        {
+            stepTimer.Stop();
+            stepTimer = null;
+        }
+        pendingSteps = null;
     }
 
     private void BruteForceButton_Click(object sender, RoutedEventArgs e)

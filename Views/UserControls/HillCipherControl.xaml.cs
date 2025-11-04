@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using SecurityProject.Services;
@@ -7,10 +8,15 @@ namespace SecurityProject.Views.UserControls;
 public partial class HillCipherControl : UserControl
 {
     private HillCipher? cipher;
+    private ObservableCollection<StepInfo> displayedSteps = new ObservableCollection<StepInfo>();
+    private System.Windows.Threading.DispatcherTimer? stepTimer;
+    private List<StepInfo>? pendingSteps;
 
     public HillCipherControl()
     {
         InitializeComponent();
+        if (StepsDisplay != null)
+            StepsDisplay.ItemsSource = displayedSteps;
         MatrixChanged(null!, null!);
     }
 
@@ -61,26 +67,62 @@ public partial class HillCipherControl : UserControl
                     : cipher.Decrypt(PlainTextInput.Text);
                 CipherTextOutput.Text = result;
                 
-                // Update step-by-step display
-                if (StepsDisplay != null)
-                {
-                    var steps = isEncrypt 
-                        ? cipher.GetEncryptionSteps(PlainTextInput.Text)
-                        : cipher.GetDecryptionSteps(PlainTextInput.Text);
-                    StepsDisplay.ItemsSource = steps;
-                }
+                // Update step-by-step display with animation
+                AnimateSteps(isEncrypt, PlainTextInput.Text);
             }
             else
             {
                 CipherTextOutput.Text = "";
-                if (StepsDisplay != null)
-                    StepsDisplay.ItemsSource = null;
+                StopStepAnimation();
+                displayedSteps.Clear();
             }
         }
         catch (ArgumentException)
         {
             CipherTextOutput.Text = "Invalid key matrix!";
         }
+    }
+
+    private void AnimateSteps(bool isEncrypt, string text)
+    {
+        if (cipher == null) return;
+        StopStepAnimation();
+        displayedSteps.Clear();
+        
+        var steps = isEncrypt 
+            ? cipher.GetEncryptionSteps(text)
+            : cipher.GetDecryptionSteps(text);
+        
+        if (steps.Count == 0) return;
+        
+        pendingSteps = steps;
+        int currentIndex = 0;
+        
+        stepTimer = new System.Windows.Threading.DispatcherTimer();
+        stepTimer.Interval = TimeSpan.FromMilliseconds(300);
+        stepTimer.Tick += (s, e) =>
+        {
+            if (currentIndex < pendingSteps.Count)
+            {
+                displayedSteps.Add(pendingSteps[currentIndex]);
+                currentIndex++;
+            }
+            else
+            {
+                StopStepAnimation();
+            }
+        };
+        stepTimer.Start();
+    }
+
+    private void StopStepAnimation()
+    {
+        if (stepTimer != null)
+        {
+            stepTimer.Stop();
+            stepTimer = null;
+        }
+        pendingSteps = null;
     }
     
     private void BackButton_Click(object sender, RoutedEventArgs e)

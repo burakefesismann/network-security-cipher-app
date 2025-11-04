@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using SecurityProject.Services;
@@ -7,10 +8,15 @@ namespace SecurityProject.Views.UserControls;
 public partial class XORCipherControl : UserControl
 {
     private XORCipher cipher = new XORCipher();
+    private ObservableCollection<StepInfo> displayedSteps = new ObservableCollection<StepInfo>();
+    private System.Windows.Threading.DispatcherTimer? stepTimer;
+    private List<StepInfo>? pendingSteps;
 
     public XORCipherControl()
     {
         InitializeComponent();
+        if (StepsDisplay != null)
+            StepsDisplay.ItemsSource = displayedSteps;
         if (KeyInput != null)
             KeyInput.Text = "KEY";
         UpdateCipher();
@@ -53,21 +59,57 @@ public partial class XORCipherControl : UserControl
                 : cipher.Decrypt(PlainTextInput.Text, KeyInput.Text);
             CipherTextOutput.Text = result;
             
-            // Update step-by-step display
-            if (StepsDisplay != null && !string.IsNullOrWhiteSpace(KeyInput.Text))
-            {
-                var steps = isEncrypt 
-                    ? cipher.GetEncryptionSteps(PlainTextInput.Text, KeyInput.Text)
-                    : cipher.GetDecryptionSteps(PlainTextInput.Text, KeyInput.Text);
-                StepsDisplay.ItemsSource = steps;
-            }
+            // Update step-by-step display with animation
+            if (!string.IsNullOrWhiteSpace(KeyInput.Text))
+                AnimateSteps(isEncrypt, PlainTextInput.Text, KeyInput.Text);
         }
         else
         {
             CipherTextOutput.Text = "";
-            if (StepsDisplay != null)
-                StepsDisplay.ItemsSource = null;
+            StopStepAnimation();
+            displayedSteps.Clear();
         }
+    }
+
+    private void AnimateSteps(bool isEncrypt, string text, string key)
+    {
+        StopStepAnimation();
+        displayedSteps.Clear();
+        
+        var steps = isEncrypt 
+            ? cipher.GetEncryptionSteps(text, key)
+            : cipher.GetDecryptionSteps(text, key);
+        
+        if (steps.Count == 0) return;
+        
+        pendingSteps = steps;
+        int currentIndex = 0;
+        
+        stepTimer = new System.Windows.Threading.DispatcherTimer();
+        stepTimer.Interval = TimeSpan.FromMilliseconds(300);
+        stepTimer.Tick += (s, e) =>
+        {
+            if (currentIndex < pendingSteps.Count)
+            {
+                displayedSteps.Add(pendingSteps[currentIndex]);
+                currentIndex++;
+            }
+            else
+            {
+                StopStepAnimation();
+            }
+        };
+        stepTimer.Start();
+    }
+
+    private void StopStepAnimation()
+    {
+        if (stepTimer != null)
+        {
+            stepTimer.Stop();
+            stepTimer = null;
+        }
+        pendingSteps = null;
     }
     
     private void BackButton_Click(object sender, RoutedEventArgs e)
