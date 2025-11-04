@@ -95,9 +95,10 @@
                 </TextBlock>
 
                 <!-- Algorithm Cards Grid -->
-                <UniformGrid Columns="3" Rows="2" 
+                <UniformGrid Columns="3" Rows="3" 
                            HorizontalAlignment="Stretch" 
                            Margin="0,0,0,30">
+                    <!-- 8 cards will fit in 3x3 grid -->
                     
                     <!-- Caesar Cipher -->
                     <Border Style="{StaticResource CardStyle}" Margin="10" x:Name="CaesarCard"
@@ -312,6 +313,78 @@
                             <Button Content="Try It →"
                                    Style="{StaticResource ModernButton}"
                                    Click="TranspositionButton_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- XOR Cipher -->
+                    <Border Style="{StaticResource CardStyle}" Margin="10" x:Name="XORCard"
+                            PreviewMouseDown="XORCard_MouseDown">
+                        <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#2A2F45" Offset="0"/>
+                                <GradientStop Color="#EF4444" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.BorderBrush>
+                        <StackPanel>
+                            <Border Background="{StaticResource XORAccent}"
+                                    Width="70" Height="70" CornerRadius="35"
+                                    HorizontalAlignment="Center" Margin="0,0,0,15">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#EF4444" BlurRadius="12" ShadowDepth="0" Opacity="0.3" RenderingBias="Performance"/>
+                                </Border.Effect>
+                                <TextBlock Text="🔐" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="XOR Cipher"
+                                      FontSize="24" FontWeight="Bold"
+                                      Foreground="{StaticResource TextBrush}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,0,0,10"/>
+                            <TextBlock Text="Bitwise XOR encryption using a key"
+                                      FontSize="13" LineHeight="20"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      TextWrapping="Wrap"
+                                      HorizontalAlignment="Center"
+                                      TextAlignment="Center"
+                                      Margin="0,0,0,25"/>
+                            <Button Content="Try It →"
+                                   Style="{StaticResource ModernButton}"
+                                   Click="XORButton_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Base64 Cipher -->
+                    <Border Style="{StaticResource CardStyle}" Margin="10" x:Name="Base64Card"
+                            PreviewMouseDown="Base64Card_MouseDown">
+                        <Border.BorderBrush>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#2A2F45" Offset="0"/>
+                                <GradientStop Color="#14B8A6" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Border.BorderBrush>
+                        <StackPanel>
+                            <Border Background="{StaticResource Base64Accent}"
+                                    Width="70" Height="70" CornerRadius="35"
+                                    HorizontalAlignment="Center" Margin="0,0,0,15">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#14B8A6" BlurRadius="12" ShadowDepth="0" Opacity="0.3" RenderingBias="Performance"/>
+                                </Border.Effect>
+                                <TextBlock Text="📦" FontSize="36" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="Base64 Encoding"
+                                      FontSize="24" FontWeight="Bold"
+                                      Foreground="{StaticResource TextBrush}"
+                                      HorizontalAlignment="Center"
+                                      Margin="0,0,0,10"/>
+                            <TextBlock Text="Binary-to-text encoding scheme"
+                                      FontSize="13" LineHeight="20"
+                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                      TextWrapping="Wrap"
+                                      HorizontalAlignment="Center"
+                                      TextAlignment="Center"
+                                      Margin="0,0,0,25"/>
+                            <Button Content="Try It →"
+                                   Style="{StaticResource ModernButton}"
+                                   Click="Base64Button_Click"/>
                         </StackPanel>
                     </Border>
 

@@ -40,7 +40,7 @@ public partial class MainWindow : Window
 
     private void AnimateCards()
     {
-        var cards = new Border[] { CaesarCard, MonoalphabeticCard, PlayfairCard, HillCard, VigenereCard, TranspositionCard };
+        var cards = new Border[] { CaesarCard, MonoalphabeticCard, PlayfairCard, HillCard, VigenereCard, TranspositionCard, XORCard, Base64Card };
         
         foreach (var card in cards)
         {
@@ -142,7 +142,17 @@ public partial class MainWindow : Window
     {
         NavigateToPage(new TranspositionCipherControl());
     }
-    
+
+    private void XORButton_Click(object sender, RoutedEventArgs e)
+    {
+        NavigateToPage(new XORCipherControl());
+    }
+
+    private void Base64Button_Click(object sender, RoutedEventArgs e)
+    {
+        NavigateToPage(new Base64CipherControl());
+    }
+
     // Card MouseDown handlers - tüm karta tıklama için
     private void CaesarCard_MouseDown(object sender, MouseButtonEventArgs e)
     {
@@ -184,6 +194,20 @@ public partial class MainWindow : Window
         if (e.Source is Button) return;
         AnimateCardClick(sender);
         NavigateToPage(new TranspositionCipherControl());
+    }
+    
+    private void XORCard_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.Source is Button) return;
+        AnimateCardClick(sender);
+        NavigateToPage(new XORCipherControl());
+    }
+    
+    private void Base64Card_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.Source is Button) return;
+        AnimateCardClick(sender);
+        NavigateToPage(new Base64CipherControl());
     }
     
     private void AnimateCardClick(object sender)

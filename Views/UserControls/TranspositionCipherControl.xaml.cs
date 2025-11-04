@@ -60,12 +60,23 @@ public partial class TranspositionCipherControl : UserControl
                     DisplayMatrix(PlainTextInput.Text, key);
                 else
                     DisplayMatrixDecrypt(PlainTextInput.Text, key);
+                
+                // Update step-by-step display
+                if (StepsDisplay != null)
+                {
+                    var steps = isEncrypt 
+                        ? cipher.GetEncryptionSteps(PlainTextInput.Text)
+                        : cipher.GetDecryptionSteps(PlainTextInput.Text);
+                    StepsDisplay.ItemsSource = steps;
+                }
             }
             else
             {
                 CipherTextOutput.Text = "";
                 if (MatrixDisplay != null)
                     MatrixDisplay.ItemsSource = null;
+                if (StepsDisplay != null)
+                    StepsDisplay.ItemsSource = null;
             }
         }
         catch

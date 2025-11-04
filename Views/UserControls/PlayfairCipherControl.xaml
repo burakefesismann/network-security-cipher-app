@@ -155,6 +155,75 @@
                     </Border>
                 </Grid>
 
+                <!-- Step-by-Step Process -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="📋 Step-by-Step Process" 
+                                  FontSize="16" FontWeight="Semibold"
+                                  Foreground="{StaticResource TextBrush}"
+                                  Margin="0,0,0,10"/>
+                        
+                        <ScrollViewer Height="400" 
+                                     VerticalScrollBarVisibility="Auto">
+                            <ItemsControl x:Name="StepsDisplay">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="{StaticResource SurfaceBrush}"
+                                               CornerRadius="6"
+                                               Padding="12"
+                                               Margin="0,0,0,8"
+                                               BorderThickness="1"
+                                               BorderBrush="{StaticResource PrimaryBrush}">
+                                            <StackPanel>
+                                                <TextBlock FontSize="14" FontWeight="Bold" 
+                                                          Foreground="{StaticResource PrimaryBrush}"
+                                                          Margin="0,0,0,5">
+                                                    <Run Text="Step "/>
+                                                    <Run Text="{Binding StepNumber}"/>
+                                                    <Run Text=": "/>
+                                                    <Run Text="{Binding Description}"/>
+                                                </TextBlock>
+                                                <Grid Margin="0,5,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" 
+                                                               Text="{Binding Input}" 
+                                                               FontSize="12"
+                                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                                               FontFamily="Consolas"
+                                                               TextWrapping="Wrap"/>
+                                                    <TextBlock Grid.Column="1" 
+                                                               Text="→" 
+                                                               FontSize="16"
+                                                               Foreground="{StaticResource PrimaryBrush}"
+                                                               FontWeight="Bold"
+                                                               Margin="10,0"/>
+                                                    <TextBlock Grid.Column="2" 
+                                                               Text="{Binding Output}" 
+                                                               FontSize="12"
+                                                               Foreground="{StaticResource TextBrush}"
+                                                               FontFamily="Consolas"
+                                                               FontWeight="Semibold"
+                                                               TextWrapping="Wrap"/>
+                                                </Grid>
+                                                <TextBlock Text="{Binding Explanation}" 
+                                                          FontSize="11"
+                                                          Foreground="{StaticResource TextSecondaryBrush}"
+                                                          FontStyle="Italic"
+                                                          Margin="0,5,0,0"
+                                                          TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+                    </StackPanel>
+                </Border>
+
                 <!-- Back Button -->
                 <Button Content="← Back to Menu" 
                        HorizontalAlignment="Left" Margin="0,15,0,0"

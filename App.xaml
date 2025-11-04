@@ -22,6 +22,8 @@
         <SolidColorBrush x:Key="HillAccent" Color="#3B82F6"/>
         <SolidColorBrush x:Key="VigenereAccent" Color="#8B5CF6"/>
         <SolidColorBrush x:Key="TranspositionAccent" Color="#06B6D4"/>
+        <SolidColorBrush x:Key="XORAccent" Color="#EF4444"/>
+        <SolidColorBrush x:Key="Base64Accent" Color="#14B8A6"/>
 
         <!-- Gradients -->
         <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0,0" EndPoint="1,1">

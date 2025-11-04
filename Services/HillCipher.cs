@@ -202,4 +202,133 @@ public class HillCipher
     }
 
     public int[,] GetKeyMatrix() => keyMatrix;
+
+    public List<StepInfo> GetEncryptionSteps(string plainText)
+    {
+        var steps = new List<StepInfo>();
+        
+        if (string.IsNullOrEmpty(plainText))
+            return steps;
+
+        steps.Add(new StepInfo(1, "Step 1: Input", "Plain Text", plainText, "Starting Hill cipher encryption"));
+
+        plainText = plainText.ToUpper();
+        List<char> textChars = new List<char>();
+        
+        foreach (char c in plainText)
+        {
+            if (char.IsLetter(c))
+                textChars.Add(c);
+        }
+        
+        steps.Add(new StepInfo(2, "Step 2: Clean Text", plainText, new string(textChars.ToArray()), "Removed non-letters"));
+
+        int matrixSize = keyMatrix.GetLength(0);
+        int paddedLength = (textChars.Count + matrixSize - 1) / matrixSize * matrixSize;
+        
+        while (textChars.Count < paddedLength)
+            textChars.Add('X');
+
+        if (paddedLength > textChars.Count - (textChars.Count % matrixSize))
+        {
+            steps.Add(new StepInfo(3, "Step 3: Padding", new string(textChars.ToArray()), 
+                new string(textChars.ToArray()), 
+                $"Added 'X' padding to make length multiple of {matrixSize}"));
+        }
+
+        List<char> result = new List<char>();
+        int stepNum = 4;
+        int blockNum = 1;
+
+        for (int i = 0; i < textChars.Count; i += matrixSize)
+        {
+            int[] vector = new int[matrixSize];
+            string vectorStr = "";
+            
+            for (int j = 0; j < matrixSize; j++)
+            {
+                vector[j] = textChars[i + j] - 'A';
+                vectorStr += $"{textChars[i + j]}({vector[j]}) ";
+            }
+            
+            int[] encryptedVector = MatrixMultiply(vector);
+            string encryptedStr = "";
+            for (int j = 0; j < matrixSize; j++)
+            {
+                char enc = (char)(encryptedVector[j] % 26 + 'A');
+                result.Add(enc);
+                encryptedStr += $"{enc} ";
+            }
+            
+            steps.Add(new StepInfo(stepNum++, $"Block {blockNum++}: Matrix Multiply", 
+                vectorStr.Trim(), 
+                encryptedStr.Trim(), 
+                $"Multiplied vector by key matrix"));
+        }
+        
+        steps.Add(new StepInfo(stepNum, "Final Result", plainText, new string(result.ToArray()), "Encryption complete"));
+        
+        return steps;
+    }
+
+    public List<StepInfo> GetDecryptionSteps(string cipherText)
+    {
+        var steps = new List<StepInfo>();
+        
+        if (string.IsNullOrEmpty(cipherText))
+            return steps;
+
+        steps.Add(new StepInfo(1, "Step 1: Input", "Cipher Text", cipherText, "Starting Hill cipher decryption"));
+
+        cipherText = cipherText.ToUpper();
+        List<char> textChars = new List<char>();
+        
+        foreach (char c in cipherText)
+        {
+            if (char.IsLetter(c))
+                textChars.Add(c);
+        }
+        
+        steps.Add(new StepInfo(2, "Step 2: Clean Text", cipherText, new string(textChars.ToArray()), "Removed non-letters"));
+
+        int matrixSize = keyMatrix.GetLength(0);
+        int[,] inverseMatrix = InverseKeyMatrix();
+        
+        steps.Add(new StepInfo(3, "Step 3: Calculate Inverse Matrix", "Key Matrix", "Inverse Matrix", "Calculated inverse of key matrix (mod 26)"));
+
+        List<char> result = new List<char>();
+        int stepNum = 4;
+        int blockNum = 1;
+
+        for (int i = 0; i < textChars.Count; i += matrixSize)
+        {
+            int[] vector = new int[matrixSize];
+            string vectorStr = "";
+            
+            for (int j = 0; j < matrixSize; j++)
+            {
+                vector[j] = textChars[i + j] - 'A';
+                vectorStr += $"{textChars[i + j]}({vector[j]}) ";
+            }
+            
+            int[] decryptedVector = MatrixMultiplyInverse(vector, inverseMatrix);
+            string decryptedStr = "";
+            for (int j = 0; j < matrixSize; j++)
+            {
+                char dec = (char)(decryptedVector[j] % 26 + 'A');
+                result.Add(dec);
+                decryptedStr += $"{dec} ";
+            }
+            
+            steps.Add(new StepInfo(stepNum++, $"Block {blockNum++}: Matrix Multiply", 
+                vectorStr.Trim(), 
+                decryptedStr.Trim(), 
+                $"Multiplied vector by inverse key matrix"));
+        }
+        
+        string final = new string(result.ToArray()).TrimEnd('X');
+        steps.Add(new StepInfo(stepNum, "Final Result", cipherText, final, "Decryption complete"));
+        
+        return steps;
+    }
 }

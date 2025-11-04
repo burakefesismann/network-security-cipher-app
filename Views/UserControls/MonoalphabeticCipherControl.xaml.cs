@@ -60,10 +60,21 @@ public partial class MonoalphabeticCipherControl : UserControl
                     ? cipher.Encrypt(PlainTextInput.Text) 
                     : cipher.Decrypt(PlainTextInput.Text);
                 CipherTextOutput.Text = result;
+                
+                // Update step-by-step display
+                if (StepsDisplay != null)
+                {
+                    var steps = isEncrypt 
+                        ? cipher.GetEncryptionSteps(PlainTextInput.Text)
+                        : cipher.GetDecryptionSteps(PlainTextInput.Text);
+                    StepsDisplay.ItemsSource = steps;
+                }
             }
             else
             {
                 CipherTextOutput.Text = "";
+                if (StepsDisplay != null)
+                    StepsDisplay.ItemsSource = null;
             }
         }
         catch (ArgumentException ex)

@@ -43,4 +43,53 @@ public class CaesarCipher
         
         return results;
     }
+
+    public List<StepInfo> GetEncryptionSteps(string plainText, int key)
+    {
+        var steps = new List<StepInfo>();
+        
+        if (string.IsNullOrEmpty(plainText))
+            return steps;
+
+        steps.Add(new StepInfo(1, "Initialization", "Plain Text", plainText, $"Starting encryption with key = {key}"));
+        
+        var result = new System.Text.StringBuilder();
+        int stepNum = 2;
+        
+        for (int i = 0; i < plainText.Length; i++)
+        {
+            char c = plainText[i];
+            
+            if (char.IsLetter(c))
+            {
+                char baseChar = char.IsUpper(c) ? 'A' : 'a';
+                int originalPos = c - baseChar;
+                int newPos = (originalPos + key) % 26;
+                char encrypted = (char)(newPos + baseChar);
+                result.Append(encrypted);
+                
+                steps.Add(new StepInfo(stepNum++, $"Process '{c}'", 
+                    $"Position: {originalPos} ({c})", 
+                    $"New Position: {newPos} ({encrypted})", 
+                    $"{c} → {encrypted} (shift by {key})"));
+            }
+            else
+            {
+                result.Append(c);
+                steps.Add(new StepInfo(stepNum++, $"Process '{c}'", 
+                    "Non-letter character", 
+                    c.ToString(), 
+                    "Non-letter characters remain unchanged"));
+            }
+        }
+        
+        steps.Add(new StepInfo(stepNum, "Final Result", plainText, result.ToString(), "Encryption complete"));
+        
+        return steps;
+    }
+
+    public List<StepInfo> GetDecryptionSteps(string cipherText, int key)
+    {
+        return GetEncryptionSteps(cipherText, 26 - (key % 26));
+    }
 }

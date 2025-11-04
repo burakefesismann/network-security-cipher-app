@@ -4,11 +4,11 @@ using SecurityProject.Services;
 
 namespace SecurityProject.Views.UserControls;
 
-public partial class VigenereCipherControl : UserControl
+public partial class XORCipherControl : UserControl
 {
-    private VigenereCipher? cipher;
+    private XORCipher cipher = new XORCipher();
 
-    public VigenereCipherControl()
+    public XORCipherControl()
     {
         InitializeComponent();
         if (KeyInput != null)
@@ -22,9 +22,9 @@ public partial class VigenereCipherControl : UserControl
         
         bool isEncrypt = ModeComboBox.SelectedIndex == 0;
         if (InputLabel != null)
-            InputLabel.Text = isEncrypt ? "Plain Text" : "Cipher Text";
+            InputLabel.Text = isEncrypt ? "Plain Text" : "Cipher Text (Hex)";
         if (OutputLabel != null)
-            OutputLabel.Text = isEncrypt ? "Cipher Text" : "Plain Text";
+            OutputLabel.Text = isEncrypt ? "Cipher Text (Hex)" : "Plain Text";
         
         UpdateCipher();
     }
@@ -45,22 +45,20 @@ public partial class VigenereCipherControl : UserControl
         if (string.IsNullOrWhiteSpace(KeyInput.Text))
             return;
 
-        cipher = new VigenereCipher(KeyInput.Text);
-        
         if (!string.IsNullOrWhiteSpace(PlainTextInput.Text))
         {
             bool isEncrypt = ModeComboBox.SelectedIndex == 0;
             string result = isEncrypt 
-                ? cipher.Encrypt(PlainTextInput.Text) 
-                : cipher.Decrypt(PlainTextInput.Text);
+                ? cipher.Encrypt(PlainTextInput.Text, KeyInput.Text) 
+                : cipher.Decrypt(PlainTextInput.Text, KeyInput.Text);
             CipherTextOutput.Text = result;
             
             // Update step-by-step display
-            if (StepsDisplay != null)
+            if (StepsDisplay != null && !string.IsNullOrWhiteSpace(KeyInput.Text))
             {
                 var steps = isEncrypt 
-                    ? cipher.GetEncryptionSteps(PlainTextInput.Text)
-                    : cipher.GetDecryptionSteps(PlainTextInput.Text);
+                    ? cipher.GetEncryptionSteps(PlainTextInput.Text, KeyInput.Text)
+                    : cipher.GetDecryptionSteps(PlainTextInput.Text, KeyInput.Text);
                 StepsDisplay.ItemsSource = steps;
             }
         }
@@ -86,3 +84,4 @@ public partial class VigenereCipherControl : UserControl
         }
     }
 }
+

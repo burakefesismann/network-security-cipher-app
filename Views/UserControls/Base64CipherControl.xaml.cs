@@ -4,15 +4,13 @@ using SecurityProject.Services;
 
 namespace SecurityProject.Views.UserControls;
 
-public partial class VigenereCipherControl : UserControl
+public partial class Base64CipherControl : UserControl
 {
-    private VigenereCipher? cipher;
+    private Base64Cipher cipher = new Base64Cipher();
 
-    public VigenereCipherControl()
+    public Base64CipherControl()
     {
         InitializeComponent();
-        if (KeyInput != null)
-            KeyInput.Text = "KEY";
         UpdateCipher();
     }
 
@@ -20,17 +18,12 @@ public partial class VigenereCipherControl : UserControl
     {
         if (ModeComboBox == null) return;
         
-        bool isEncrypt = ModeComboBox.SelectedIndex == 0;
+        bool isEncode = ModeComboBox.SelectedIndex == 0;
         if (InputLabel != null)
-            InputLabel.Text = isEncrypt ? "Plain Text" : "Cipher Text";
+            InputLabel.Text = isEncode ? "Plain Text" : "Base64 Encoded";
         if (OutputLabel != null)
-            OutputLabel.Text = isEncrypt ? "Cipher Text" : "Plain Text";
+            OutputLabel.Text = isEncode ? "Base64 Encoded" : "Plain Text";
         
-        UpdateCipher();
-    }
-
-    private void KeyInput_TextChanged(object sender, TextChangedEventArgs e)
-    {
         UpdateCipher();
     }
 
@@ -41,26 +34,22 @@ public partial class VigenereCipherControl : UserControl
 
     private void UpdateCipher()
     {
-        if (KeyInput == null || PlainTextInput == null || CipherTextOutput == null || ModeComboBox == null) return;
-        if (string.IsNullOrWhiteSpace(KeyInput.Text))
-            return;
+        if (PlainTextInput == null || CipherTextOutput == null || ModeComboBox == null) return;
 
-        cipher = new VigenereCipher(KeyInput.Text);
-        
         if (!string.IsNullOrWhiteSpace(PlainTextInput.Text))
         {
-            bool isEncrypt = ModeComboBox.SelectedIndex == 0;
-            string result = isEncrypt 
-                ? cipher.Encrypt(PlainTextInput.Text) 
-                : cipher.Decrypt(PlainTextInput.Text);
+            bool isEncode = ModeComboBox.SelectedIndex == 0;
+            string result = isEncode 
+                ? cipher.Encode(PlainTextInput.Text) 
+                : cipher.Decode(PlainTextInput.Text);
             CipherTextOutput.Text = result;
             
             // Update step-by-step display
             if (StepsDisplay != null)
             {
-                var steps = isEncrypt 
-                    ? cipher.GetEncryptionSteps(PlainTextInput.Text)
-                    : cipher.GetDecryptionSteps(PlainTextInput.Text);
+                var steps = isEncode 
+                    ? cipher.GetEncodingSteps(PlainTextInput.Text)
+                    : cipher.GetDecodingSteps(PlainTextInput.Text);
                 StepsDisplay.ItemsSource = steps;
             }
         }
@@ -86,3 +75,4 @@ public partial class VigenereCipherControl : UserControl
         }
     }
 }
+

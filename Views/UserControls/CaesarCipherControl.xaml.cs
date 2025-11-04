@@ -52,10 +52,21 @@ public partial class CaesarCipherControl : UserControl
                 ? cipher.Encrypt(PlainTextInput.Text, key) 
                 : cipher.Decrypt(PlainTextInput.Text, key);
             CipherTextOutput.Text = result;
+            
+            // Update step-by-step display
+            if (StepsDisplay != null)
+            {
+                var steps = isEncrypt 
+                    ? cipher.GetEncryptionSteps(PlainTextInput.Text, key)
+                    : cipher.GetDecryptionSteps(PlainTextInput.Text, key);
+                StepsDisplay.ItemsSource = steps;
+            }
         }
         else
         {
             CipherTextOutput.Text = "";
+            if (StepsDisplay != null)
+                StepsDisplay.ItemsSource = null;
         }
     }
 

@@ -90,4 +90,92 @@ public class MonoalphabeticCipher
         
         return new string(alphabet.ToArray());
     }
+
+    public List<StepInfo> GetEncryptionSteps(string plainText)
+    {
+        var steps = new List<StepInfo>();
+        
+        if (string.IsNullOrEmpty(plainText))
+            return steps;
+
+        steps.Add(new StepInfo(1, "Initialization", "Plain Text", plainText, "Starting encryption with substitution key"));
+        
+        var result = new System.Text.StringBuilder();
+        int stepNum = 2;
+        
+        for (int i = 0; i < plainText.Length; i++)
+        {
+            char c = plainText[i];
+            
+            if (char.IsLetter(c))
+            {
+                char upperC = char.ToUpper(c);
+                char encrypted = encryptionMap[upperC];
+                if (char.IsLower(c))
+                    encrypted = char.ToLower(encrypted);
+                result.Append(encrypted);
+                
+                steps.Add(new StepInfo(stepNum++, $"Map '{c}'", 
+                    $"Input: {c}", 
+                    $"Output: {encrypted}", 
+                    $"{c} → {encrypted} (using substitution table)"));
+            }
+            else
+            {
+                result.Append(c);
+                steps.Add(new StepInfo(stepNum++, $"Process '{c}'", 
+                    "Non-letter character", 
+                    c.ToString(), 
+                    "Non-letter characters remain unchanged"));
+            }
+        }
+        
+        steps.Add(new StepInfo(stepNum, "Final Result", plainText, result.ToString(), "Encryption complete"));
+        
+        return steps;
+    }
+
+    public List<StepInfo> GetDecryptionSteps(string cipherText)
+    {
+        var steps = new List<StepInfo>();
+        
+        if (string.IsNullOrEmpty(cipherText))
+            return steps;
+
+        steps.Add(new StepInfo(1, "Initialization", "Cipher Text", cipherText, "Starting decryption with substitution key"));
+        
+        var result = new System.Text.StringBuilder();
+        int stepNum = 2;
+        
+        for (int i = 0; i < cipherText.Length; i++)
+        {
+            char c = cipherText[i];
+            
+            if (char.IsLetter(c))
+            {
+                char upperC = char.ToUpper(c);
+                char decrypted = decryptionMap[upperC];
+                if (char.IsLower(c))
+                    decrypted = char.ToLower(decrypted);
+                result.Append(decrypted);
+                
+                steps.Add(new StepInfo(stepNum++, $"Map '{c}'", 
+                    $"Input: {c}", 
+                    $"Output: {decrypted}", 
+                    $"{c} → {decrypted} (using reverse substitution table)"));
+            }
+            else
+            {
+                result.Append(c);
+                steps.Add(new StepInfo(stepNum++, $"Process '{c}'", 
+                    "Non-letter character", 
+                    c.ToString(), 
+                    "Non-letter characters remain unchanged"));
+            }
+        }
+        
+        steps.Add(new StepInfo(stepNum, "Final Result", cipherText, result.ToString(), "Decryption complete"));
+        
+        return steps;
+    }
 }
